@@ -4,6 +4,7 @@ import com.benki.weather.network.WeatherApi
 import com.benki.weather.network.models.ErrorResponse
 import com.benki.weather.network.models.NetworkResponse
 import com.benki.weather.network.models.WeatherApiResponse
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,14 +13,18 @@ import org.json.JSONObject
 import retrofit2.HttpException
 import retrofit2.Response
 
-class WeatherRepositoryImpl(private val weatherApi: WeatherApi) : WeatherRepository {
+class WeatherRepositoryImpl(private val weatherApi: WeatherApi) :
+    WeatherRepository {
     private val _networkResponse: MutableStateFlow<NetworkResponse> =
-        MutableStateFlow(NetworkResponse.Loading)
+        MutableStateFlow(NetworkResponse.Idle)
     override val networkResponse: StateFlow<NetworkResponse> = _networkResponse.asStateFlow()
     override suspend fun getWeatherUpdates(
         query: String,
         airQualityIndex: String
     ) {
+        _networkResponse.update {
+            NetworkResponse.Loading
+        }
         try {
             val response: Response<WeatherApiResponse> =
                 weatherApi.getWeatherUpdates(query, airQualityIndex)

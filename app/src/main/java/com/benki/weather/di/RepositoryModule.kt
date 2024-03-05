@@ -12,7 +12,7 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
     @Provides
-    fun provideWeatherRepository(weatherApi: WeatherApi) : WeatherRepository{
+    fun provideWeatherRepository(weatherApi: WeatherApi): WeatherRepository {
         return WeatherRepositoryImpl(weatherApi = weatherApi)
     }
 }
