@@ -108,6 +108,11 @@ dependencies {
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // Location services
+    implementation("com.google.android.gms:play-services-location:21.2.0")
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
+
 }
 
 // Allow references to generated code

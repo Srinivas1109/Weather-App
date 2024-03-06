@@ -78,7 +78,7 @@ fun HomeScreen(
                             .fillMaxWidth()
                             .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceAround
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Column {
                             Image(
@@ -87,7 +87,7 @@ fun HomeScreen(
                                 modifier = modifier.size(150.dp)
                             )
                         }
-                        Column(horizontalAlignment = Alignment.Start) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 text = "$temperature_c °C",
                                 color = Color.White,
@@ -125,11 +125,16 @@ fun HomeScreen(
                                     contentDescription = "location",
                                     tint = Color.White
                                 )
-
-                                Text(
-                                    text = "$location, $region",
-                                    color = Color.White,
-                                )
+                                Column {
+                                    Text(
+                                        text = location,
+                                        color = Color.White,
+                                    )
+                                    Text(
+                                        text = region,
+                                        color = Color.White,
+                                    )
+                                }
                             }
                         }
                     }

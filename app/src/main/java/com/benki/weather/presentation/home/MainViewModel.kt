@@ -29,7 +29,12 @@ class MainViewModel @Inject constructor(private val weatherRepository: WeatherRe
 
     init {
         viewModelScope.launch {
-            weatherRepository.getWeatherUpdates(query = "bengaluru", "yes")
+            val location = weatherRepository.getDeviceLastLocation()
+            if (location != null) {
+                weatherRepository.getWeatherUpdates(query = "${location.latitude},${location.longitude}", "yes")
+            }else{
+                weatherRepository.getWeatherUpdates(query = "bengaluru", "yes")
+            }
         }
     }
 
@@ -45,8 +50,8 @@ class MainViewModel @Inject constructor(private val weatherRepository: WeatherRe
         }
     }
 
-    fun search(query: String){
-        if(query.isNotEmpty()){
+    fun search(query: String) {
+        if (query.isNotEmpty()) {
             _uiState.update {
                 it.copy(searchActive = false)
             }
