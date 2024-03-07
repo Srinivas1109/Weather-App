@@ -35,7 +35,7 @@ fun LoadingComponent(modifier: Modifier = Modifier, query: String = "") {
             contentDescription = null,
         )
         Text(
-            text = "Fetching the weather report of \"$query\"",
+            text = "Fetching the weather latest report...",
             fontSize = 20.sp,
             color = Color.White,
             modifier = modifier.fillMaxWidth(0.7f),

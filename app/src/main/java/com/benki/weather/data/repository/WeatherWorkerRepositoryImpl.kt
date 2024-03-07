@@ -10,19 +10,18 @@ import androidx.work.workDataOf
 import com.benki.weather.workers.WeatherWorker
 import java.time.Duration
 
-class WeatherWorkerRepositoryImpl(private val context: Context) : WeatherWorkerRepository {
+class WeatherWorkerRepositoryImpl(context: Context) : WeatherWorkerRepository {
     private val workManager = WorkManager.getInstance(context)
 
     override fun enqueuePeriodicWorkRequest(duration: Duration) {
         val periodicWorkRequest: PeriodicWorkRequest =
             PeriodicWorkRequestBuilder<WeatherWorker>(duration)
-//                .setInputData(workDataOf("location" to location))
                 .setConstraints(Constraints(requiresBatteryNotLow = true))
                 .build()
 
         workManager.enqueueUniquePeriodicWork(
             WEATHER_WORKER_NAME,
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            ExistingPeriodicWorkPolicy.KEEP,
             periodicWorkRequest
         )
     }

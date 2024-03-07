@@ -31,8 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.benki.weather.R
 import com.benki.weather.network.models.WeatherApiResponse
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import com.benki.weather.presentation.components.Forecast
+import com.benki.weather.presentation.components.OtherDetails
+import com.benki.weather.utils.DateUtils.convertDateTime
 
 @Composable
 fun HomeScreen(
@@ -41,14 +42,19 @@ fun HomeScreen(
 ) {
     val location = weatherApiResponse.location.name
     val region = weatherApiResponse.location.region
-    val localDate = LocalDate.now()
-    val day = localDate.dayOfWeek
     val temperature_c = weatherApiResponse.weatherData.temperatureCelsius
     val feelsLike_c = weatherApiResponse.weatherData.feelsLikeCelsius
     val condition = weatherApiResponse.weatherData.weatherCondition.text
     val isDay = weatherApiResponse.weatherData.isDay == 1
-    val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
-    val date = localDate.format(formatter)
+    val dateTimeDayOfWeek = convertDateTime(weatherApiResponse.weatherData.lastUpdated)
+    val day = dateTimeDayOfWeek.third
+    val date = dateTimeDayOfWeek.first
+    val time = dateTimeDayOfWeek.second
+    val forecast = weatherApiResponse.forecast.forecastDay
+    val humidity = weatherApiResponse.weatherData.humidity
+    val precipitation = weatherApiResponse.weatherData.precipIN
+    val wind = weatherApiResponse.weatherData.windKiloMetersPerHour
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -86,6 +92,8 @@ fun HomeScreen(
                                 contentDescription = null,
                                 modifier = modifier.size(150.dp)
                             )
+                            Spacer(modifier = modifier.height(8.dp))
+                            Text(text = "Last updated at $time", color = Color.White, fontSize = 14.sp)
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
@@ -106,7 +114,7 @@ fun HomeScreen(
                             )
                             Spacer(modifier = modifier.height(16.dp))
                             Text(
-                                text = day.name.lowercase().replaceFirstChar { it.uppercase() },
+                                text = day.lowercase().replaceFirstChar { it.uppercase() },
                                 color = Color.White,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
@@ -145,6 +153,8 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
+                OtherDetails(humidity = humidity, precipitation = precipitation, wind = wind)
+                Forecast(forecastData = forecast)
             }
         }
     }

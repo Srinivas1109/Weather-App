@@ -104,7 +104,10 @@ class WeatherRepositoryImpl(private val weatherApi: WeatherApi, private val cont
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    context,
+        Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
         ) {
             println("DEVICE_LOCATION: PERMISSION DENIED")
             continuation.resume(null)
@@ -113,6 +116,22 @@ class WeatherRepositoryImpl(private val weatherApi: WeatherApi, private val cont
                 println("DEVICE_LOCATION: PERMISSION GRANTED: $location")
                 continuation.resume(location)
             }
+        }
+    }
+
+    override suspend fun getWorkerWeatherUpdates(
+        query: String,
+        airQualityIndex: String
+    ): WeatherApiResponse? {
+        return try {
+            val response = weatherApi.getWeatherUpdates(query, "yes")
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            null
         }
     }
 

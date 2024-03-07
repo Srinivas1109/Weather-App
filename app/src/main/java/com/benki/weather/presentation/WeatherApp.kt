@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -66,6 +67,7 @@ fun WeatherApp(
         label = "Weather Loading"
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val focusManager = LocalFocusManager.current
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -135,6 +137,7 @@ fun WeatherApp(
                         if (uiState.query.isNotEmpty()) {
                             IconButton(onClick = {
                                 viewModel.updateQuery("")
+                                focusManager.clearFocus()
                             }) {
                                 Icon(
                                     imageVector = Icons.Filled.Close,
