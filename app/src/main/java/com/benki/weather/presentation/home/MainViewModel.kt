@@ -34,17 +34,21 @@ class MainViewModel @Inject constructor(
     )
 
     init {
-        workerRepository.enqueuePeriodicWorkRequest(Duration.ofHours(6L))
-        viewModelScope.launch {
-            val location = weatherRepository.getDeviceLastLocation()
-            if (location != null) {
-                weatherRepository.getWeatherUpdates(
-                    query = "${location.latitude},${location.longitude}",
-                    "yes"
-                )
-            } else {
-                weatherRepository.getWeatherUpdates(query = "bengaluru", "yes")
+        try {
+            workerRepository.enqueuePeriodicWorkRequest(Duration.ofHours(6L))
+            viewModelScope.launch {
+                val location = weatherRepository.getDeviceLastLocation()
+                if (location != null) {
+                    weatherRepository.getWeatherUpdates(
+                        query = "${location.latitude},${location.longitude}",
+                        "yes"
+                    )
+                } else {
+                    weatherRepository.getWeatherUpdates(query = "bengaluru", "yes")
+                }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -61,20 +65,37 @@ class MainViewModel @Inject constructor(
     }
 
     fun search(query: String) {
-        if (query.isNotEmpty()) {
-            _uiState.update {
-                it.copy(searchActive = false)
+        try {
+            if (query.isNotEmpty()) {
+                _uiState.update {
+                    it.copy(searchActive = false)
+                }
+                viewModelScope.launch {
+                    weatherRepository.getWeatherUpdates(query, "yes")
+                }
+            } else {
+                viewModelScope.launch {
+                    val location: Location? = weatherRepository.getDeviceLastLocation()
+                    location?.let {
+                        weatherRepository.getWeatherUpdates("${it.latitude},${it.longitude}", "yes")
+                    }
+                }
             }
-            viewModelScope.launch {
-                weatherRepository.getWeatherUpdates(query, "yes")
-            }
-        } else {
+        }catch (e: Exception){
+            e.printStackTrace()
+        }
+    }
+
+    fun searchCurrentLocation() {
+        try {
             viewModelScope.launch {
                 val location: Location? = weatherRepository.getDeviceLastLocation()
                 location?.let {
                     weatherRepository.getWeatherUpdates("${it.latitude},${it.longitude}", "yes")
                 }
             }
+        }catch (e: Exception){
+            e.printStackTrace()
         }
     }
 }

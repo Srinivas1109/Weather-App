@@ -113,6 +113,8 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.2.0")
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
 
+    // Accompanist permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.35.0-alpha")
 }
 
 // Allow references to generated code

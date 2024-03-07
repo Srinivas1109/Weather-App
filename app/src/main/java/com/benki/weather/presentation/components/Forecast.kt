@@ -19,7 +19,7 @@ import com.benki.weather.utils.DateUtils.convertDateToDay
 fun Forecast(modifier: Modifier = Modifier, forecastData: List<ForecastDayItem> = emptyList()) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.inversePrimary),
         elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Row(

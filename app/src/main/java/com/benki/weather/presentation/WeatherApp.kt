@@ -1,11 +1,7 @@
 package com.benki.weather.presentation
 
-import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -33,17 +29,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.benki.weather.network.models.NetworkResponse
 import com.benki.weather.presentation.components.ErrorComponent
 import com.benki.weather.presentation.components.LoadingComponent
+import com.benki.weather.presentation.components.RequestPermissions
 import com.benki.weather.presentation.home.HomeScreen
 import com.benki.weather.presentation.home.MainViewModel
 
@@ -57,30 +55,41 @@ fun WeatherApp(
     var loading by remember {
         mutableStateOf(false)
     }
-    val infiniteTransition = rememberInfiniteTransition(label = "Loading Animation")
-    val rotateAnimation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = EaseIn)
-        ),
-        label = "Weather Loading"
-    )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { viewModel.search(uiState.query) },
-                shape = RoundedCornerShape(8.dp),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = "Refresh",
-                    modifier = if (loading) modifier.rotate(rotateAnimation) else modifier
-                )
+
+                FloatingActionButton(
+                    onClick = {
+                        viewModel.search(uiState.query)
+                    },
+                    shape = RoundedCornerShape(8.dp),
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Refresh,
+                        contentDescription = "Refresh",
+                    )
+                }
+
+                FloatingActionButton(
+                    onClick = viewModel::searchCurrentLocation,
+                    shape = RoundedCornerShape(8.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.LocationOn,
+                        contentDescription = "Your location",
+                    )
+                }
             }
         }, contentWindowInsets = WindowInsets(0.dp)
     ) { contentPadding ->
@@ -98,11 +107,15 @@ fun WeatherApp(
                 .fillMaxSize()
                 .padding(contentPadding)
         ) {
+            RequestPermissions()
             Column(modifier = modifier.fillMaxSize()) {
                 SearchBar(
                     query = uiState.query,
                     onQueryChange = viewModel::updateQuery,
-                    onSearch = viewModel::search,
+                    onSearch = {
+                        keyboardController?.hide()
+                        viewModel.search(query = uiState.query)
+                    },
                     active = false,
                     onActiveChange = viewModel::toggleSearch,
                     modifier = modifier.fillMaxWidth(),
@@ -156,7 +169,8 @@ fun WeatherApp(
                     is NetworkResponse.Success -> {
                         loading = false
                         HomeScreen(
-                            weatherApiResponse = (networkResponse as NetworkResponse.Success).data)
+                            weatherApiResponse = (networkResponse as NetworkResponse.Success).data,
+                        )
                     }
 
                     is NetworkResponse.Error -> {
