@@ -42,11 +42,11 @@ class WeatherWorker @AssistedInject constructor(
                 println("WEATHER_WORKER: $weatherResponseApi")
                 Result.success()
             } else {
-                Result.failure()
+                Result.retry()
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            Result.failure()
+            Result.retry()
         }
     }
 }
